@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Sensor {
+  id                String    @id
+  name              String
+  location          String
+  siaga_threshold   Float
+  waspada_threshold Float
+  awas_threshold    Float
+  readings          Reading[]
+}
+
+model SensorReading {
+  id        String   @id @default(uuid())
+  sensor_id String
+  value     Float
+  timestamp DateTime
+
+  sensor Sensor @relation(fields: [sensor_id], references: [id])
+  
+  @@index([sensor_id, timestamp])
+}
