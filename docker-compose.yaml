@@ -1,0 +1,23 @@
+services: 
+  db:
+    container_name: db
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://username:password@db_name:5432/?schema=public
+    depends_on:
+      - db
+volumes:
+  db_data:

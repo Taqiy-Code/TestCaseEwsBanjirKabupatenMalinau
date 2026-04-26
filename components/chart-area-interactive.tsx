@@ -32,7 +32,7 @@ import {
 
 const chartConfig = {
   value: {
-    label: "Water Level",
+    label: "Water Level : ",
     color: "var(--primary)",
   },
 } satisfies ChartConfig
@@ -54,8 +54,7 @@ export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
 
   const filteredData = React.useMemo(() => {
     if (!data || data.length === 0) return []
-    
-    
+        
     const latestDate = new Date(data[data.length - 1].timestamp)
     let hoursToSubtract = 24
     if (timeRange === "8h") hoursToSubtract = 8
@@ -117,25 +116,39 @@ export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
-                return date.toLocaleTimeString("id-ID", {
+                const formattedTime = date.toLocaleTimeString("id-ID", {
                   hour: "2-digit",
                   minute: "2-digit",
+                  timeZone: "Asia/Makassar",
+                  timeZoneName: "short"
                 })
+                return formattedTime
               }}
             />
-            <ChartTooltip
+           <ChartTooltip
               cursor={true}
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  }}
-                  indicator="line"
+                formatter={(value, name, props) => {
+                  const { timestamp } = props.payload;
+                  const formattedTime = new Date(timestamp).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    timeZone: "Asia/Makassar",
+                    timeZoneName: "short",
+                  });
+                  return (
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground">
+                        Waktu: {formattedTime}
+                      </span>
+                      <span className="font-bold">
+                        {name}: {value} cm
+                      </span>
+                    </div>
+                  )
+                }}
+                indicator="line"
                 />
               }
             />
