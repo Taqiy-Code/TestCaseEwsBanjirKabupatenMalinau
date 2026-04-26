@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header"
 import { getStatus } from "@/lib/status"
 
 import prisma from "@/lib/prisma"
+import { timeStamp } from "console"
 
 export const dynamic = "force-dynamic"
 export default async function Page() {
@@ -17,10 +18,23 @@ export default async function Page() {
 
       const currentStatus = latestReading ? getStatus(latestReading.value, sensor) : 'AMAN'
 
+      const historiesReading = await prisma.sensorReading.findMany({
+        where : { sensor_id : sensor.id },
+        orderBy : { timestamp : 'asc' },
+        take : -1440,
+      })
+      
+      const chartData = historiesReading.map(reading => ({
+        timestamp: reading.timestamp,
+        value: Number(reading.value.toFixed(2)),
+      }))
+
+
       return {
         ...sensor,
         latestReading,
         currentStatus,
+        chartData,
       }
     })
   )
@@ -40,25 +54,18 @@ export default async function Page() {
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
             
             <div className="px-4 lg:px-6">
-              {/* Gunakan GRID alih-alih FLEX */}
-              {/* grid-cols-1 untuk HP, lg:grid-cols-3 untuk layar besar (sejajar 1 baris) */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 
                 {dashboardData.map((data: any, index: number) => (
-                  // Gabungkan Card dan Chart dalam 1 kolom per sensor
                   <div className="flex flex-col gap-4 h-full" key={index}>
                     
-                    {/* Card (Bagian Atas) */}
                     <div className="flex-1">
                       <SectionCards data={data} />
                     </div>
                     
-                    {/* Chart (Bagian Bawah) */}
-                    {/* Nanti Anda bisa mengoper data grafik ke dalam komponen ini */}
-                    <div className="flex-[2]"> 
-                      <ChartAreaInteractive /> 
+                    <div className="flex-2"> 
+                      <ChartAreaInteractive data={data.chartData}/> 
                     </div>
-
                   </div>
                 ))}
 
