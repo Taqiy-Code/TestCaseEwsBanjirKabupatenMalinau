@@ -10,78 +10,65 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { getStatus, getStatusColor} from "@/lib/status"
+import { BadgeCheck, Info, AlertTriangle, CheckCircle2 } from "lucide-react"
 
-export function SectionCards() {
+interface SectionCardProps {
+  id: number
+  name: string
+  location: string
+  currentStatus: string
+  siaga_threshold: number
+  waspada_threshold: number
+  awas_threshold: number
+  latestReading: any
+}
+
+function getStatusIcon(status: string) {
+  switch (status) {
+    case "AWAS": return <AlertTriangle/>
+    case "WASPADA": return <AlertTriangle/>
+    case "SIAGA": return <Info/>
+    default: return <CheckCircle2 />
+  }
+}
+
+export function SectionCards({ data }: { data: SectionCardProps }) {
+  const isWaspadaOrAwas = data.currentStatus === "WASPADA" || data.currentStatus === "AWAS"
+  const highlightedClass = isWaspadaOrAwas ? getStatusColor(data.currentStatus) : ""  
+
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-3 dark:*:data-[slot=card]:bg-card">
-      <Card className="@container/card">
+      <div className="grid grid-cols-1 gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-1 dark:*:data-[slot=card]:bg-card">
+      <Card className={highlightedClass + " @container/card"}>
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
+          <CardDescription>{ data.location }</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            { data.name }
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingDownIcon
-              />
-              -20%
+            <Badge variant="outline" className={getStatusColor(data.currentStatus)}>
+              {getStatusIcon(data.currentStatus)} {getStatus(data.latestReading.value, data)}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period{" "}
-            <TrendingDownIcon className="size-4" />
+            Reading Terbaru: {data.latestReading.value} {data.latestReading.unit}
           </div>
           <div className="text-muted-foreground">
-            Acquisition needs attention
+             {new Date(data.latestReading.timestamp).toLocaleString('id-ID', {
+              weekday: 'long',  
+              day: 'numeric',  
+              month: 'long',   
+              year: 'numeric',   
+              hour: '2-digit',  
+              minute: '2-digit',
+              timeZone: 'Asia/Makassar',
+              timeZoneName: 'short'      
+            })}
           </div>
         </CardFooter>
       </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention{" "}
-            <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +4.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase{" "}
-            <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
-        </CardFooter>
-      </Card>
-    </div>
+    </div>    
   )
 }

@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -21,6 +20,8 @@ model SensorReading {
   id        String   @id @default(uuid())
   sensor_id String
   value     Float
+  unit      String
+
   timestamp DateTime
 
   sensor Sensor @relation(fields: [sensor_id], references: [id])
