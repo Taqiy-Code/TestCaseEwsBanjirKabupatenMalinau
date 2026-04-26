@@ -46,3 +46,5 @@ npx prisma db seed
 npm run dev
 ```
 
+## User Interface 
+![Dashboard EWS Malinau](./public/screenshots/dashboard-preview.png)
