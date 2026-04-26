@@ -2,29 +2,29 @@ import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
 import { getStatus } from "@/lib/status"
-
+import { Sensor, SensorReading } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { timeStamp } from "console"
 
 export const dynamic = "force-dynamic"
 export default async function Page() {
   const sensors = await prisma.sensor.findMany()
-  const dashboardData = await Promise.all(
+
+  const dashboardData: any[] = await Promise.all(
     sensors.map(async (sensor) => {
       const latestReading = await prisma.sensorReading.findFirst({
         where : {sensor_id: sensor.id},
         orderBy: { timestamp: 'desc' },
       })
 
-      const currentStatus = latestReading ? getStatus(latestReading.value, sensor) : 'AMAN'
+      const currentStatus: String = latestReading ? getStatus(latestReading.value, sensor) : 'AMAN'
 
-      const historiesReading = await prisma.sensorReading.findMany({
+      const historiesReading: SensorReading[] = await prisma.sensorReading.findMany({
         where : { sensor_id : sensor.id },
         orderBy : { timestamp : 'asc' },
         take : -1440,
       })
       
-      const chartData = historiesReading.map(reading => ({
+      const chartData: any[] = historiesReading.map(reading => ({
         timestamp: reading.timestamp,
         value: Number(reading.value.toFixed(2)),
       }))
