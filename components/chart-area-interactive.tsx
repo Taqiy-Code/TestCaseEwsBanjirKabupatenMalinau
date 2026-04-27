@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -54,7 +54,7 @@ export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
 
   const filteredData = React.useMemo(() => {
     if (!data || data.length === 0) return []
-        
+
     const latestDate = new Date(data[data.length - 1].timestamp)
     let hoursToSubtract = 24
     if (timeRange === "8h") hoursToSubtract = 8
@@ -125,30 +125,37 @@ export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
                 return formattedTime
               }}
             />
-           <ChartTooltip
+            <YAxis
+              dataKey="value"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={20}
+            />
+            <ChartTooltip
               cursor={true}
               content={
                 <ChartTooltipContent
-                formatter={(value, name, props) => {
-                  const { timestamp } = props.payload;
-                  const formattedTime = new Date(timestamp).toLocaleTimeString("id-ID", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    timeZone: "Asia/Makassar",
-                    timeZoneName: "short",
-                  });
-                  return (
-                    <div className="flex flex-col">
-                      <span className="text-xs text-muted-foreground">
-                        Waktu: {formattedTime}
-                      </span>
-                      <span className="font-bold">
-                        {name}: {value} cm
-                      </span>
-                    </div>
-                  )
-                }}
-                indicator="line"
+                  formatter={(value, name, props) => {
+                    const { timestamp } = props.payload;
+                    const formattedTime = new Date(timestamp).toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      timeZone: "Asia/Makassar",
+                      timeZoneName: "short",
+                    });
+                    return (
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Waktu: {formattedTime}
+                        </span>
+                        <span className="font-bold">
+                          {name}: {value} cm
+                        </span>
+                      </div>
+                    )
+                  }}
+                  indicator="line"
                 />
               }
             />
